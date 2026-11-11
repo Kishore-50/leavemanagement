@@ -44,12 +44,17 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     const username = $("username").value.trim();
     const email = $("reg-email").value.trim().toLowerCase();
+    const password = $("reg-password").value;
     const rollNumber = $("roll-number").value.trim();
     const casualLeave = Number($("casual-leave").value);
     const medicalLeave = Number($("medical-leave").value);
 
-    if (!username || !email || !rollNumber) {
+    if (!username || !email || !rollNumber || !password) {
       message("Please fill all required fields", "registration-response");
+      return;
+    }
+    if (password.length < 8) {
+      message("Password must be at least 8 characters", "registration-response");
       return;
     }
     if (!Number.isInteger(casualLeave) || casualLeave < 0 ||
@@ -63,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       message("An account with this email already exists", "registration-response");
       return;
     }
-    users[email] = { username, email, rollNumber, casualLeave, medicalLeave };
+    users[email] = { username, email, password, rollNumber, casualLeave, medicalLeave };
     saveUsers(users);
     $("registration-form").reset();
     showLogin();
@@ -73,9 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
   $("login-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const email = $("email").value.trim().toLowerCase();
+    const password = $("password").value;
     const user = getUsers()[email];
     if (!user) {
       message("User not found. Please create an account first.");
+      return;
+    }
+    if (user.password !== password) {
+      message("Incorrect password.");
       return;
     }
     currentEmail = email;
